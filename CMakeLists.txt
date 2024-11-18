@@ -48,3 +48,6 @@ target_link_libraries(app PRIVATE glfw)
 
 if(WIN32)
     set_target_properties(app PROPERTIES LINK_FLAGS "-mwindows")
+
+endif()
+
