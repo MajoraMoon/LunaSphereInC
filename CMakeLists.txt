@@ -22,13 +22,14 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(GLFW_DIR ${CMAKE_SOURCE_DIR}/lib/glfw-3.4)
 
 
-# Override GLFW options to disable unnecessary builds (It works so don't blame me please, these files don't exist anymore)
+# Override GLFW options to disable unnecessary builds (It works so don't blame me
+# please, these files don't exist anymore)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 
-# GLFW is added as a subdirectory
+# GLFW is added as a subdirectory (makefile)
 add_subdirectory(${GLFW_DIR} ${CMAKE_BINARY_DIR}/glfw_build)
 
 
