@@ -52,9 +52,17 @@ add_executable(app ${SOURCES} ${GLAD_SRC})
 
 target_link_libraries(app PRIVATE glfw)
 
+option(ENABLE_WINDOWS_NO_CONSOLE 
+       "Suppress console window on Windows by adding -mwindows linker flag" OFF)
 
 if(WIN32)
-  #  set_target_properties(app PROPERTIES LINK_FLAGS "-mwindows")
+  message(STATUS "Configuring for Windows platform")
 
+  if(ENABLE_WINDOWS_NO_CONSOLE)
+    message(STATUS "Enabling -mwindows linker flag to suppress console window")
+    set_target_properties(app PROPERTIES LINK_FLAGS "-mwindows")
+  else()
+    message(STATUS "Console window will remain visible during runtime")
+  endif()
 endif()
 
