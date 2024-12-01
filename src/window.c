@@ -71,7 +71,7 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, SCR_HEIGHT, SCR_WIDTH);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -98,7 +98,7 @@ int main(int argc, char const *argv[])
     // check for compiling shader errors.. (fragment)
     if (!success)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
         printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
     }
 
@@ -166,7 +166,7 @@ int main(int argc, char const *argv[])
     glBindVertexArray(0);
 
     // shows the Forms in Wireframe mode
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     /*
         Main loop to open the glfw window.
@@ -203,6 +203,11 @@ int main(int argc, char const *argv[])
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteProgram(shaderProgram);
 
     glfwTerminate();
     return 0;
