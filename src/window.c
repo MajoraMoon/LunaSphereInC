@@ -19,6 +19,9 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
 
+double lastTime = 0.0;
+int frames = 0;
+
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
                                  "void main()\n"
@@ -59,6 +62,8 @@ int main(int argc, char const *argv[])
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+    glfwSwapInterval(1); // V-Sync enabled
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -115,10 +120,16 @@ int main(int argc, char const *argv[])
 
     // setting up vertex data
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+        0.5f, 0.5f, 0.0f,   // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f   // top left
 
+    };
+
+    unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
     };
 
     // Vertex Buffer Object. Basically the data we give to the gpu.
@@ -127,9 +138,13 @@ int main(int argc, char const *argv[])
     // Vertex Array Object
     unsigned int VAO;
 
+    // Element Buffer Object
+    unsigned int EBO;
+
     // generates a unique ID for the given buffer
-    glGenBuffers(1, &VBO);
     glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
 
@@ -139,20 +154,39 @@ int main(int argc, char const *argv[])
     // Copy buffer to the gpu's memory and tell it what kind of object (static) it will show
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     // set the vertex attributes pointers
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
+
+    // shows the Forms in Wireframe mode
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     /*
         Main loop to open the glfw window.
         listens to Events happening to the gflw window. For example window resizing.
+
     */
+
     while (!glfwWindowShouldClose(window))
     {
+
+        // counts and prints Frames per second
+        double currentTime = glfwGetTime();
+        frames++;
+        if (currentTime - lastTime >= 1.0)
+        {
+            printf("FPS: %d\n", frames);
+            frames = 0;
+            lastTime = currentTime;
+        }
+
         // input
         processInput(window);
 
@@ -162,7 +196,8 @@ int main(int argc, char const *argv[])
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //  glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
