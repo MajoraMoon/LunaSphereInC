@@ -121,14 +121,14 @@ int main(int argc, char const *argv[])
     // setting up vertex data
     float vertices[] = {
         // first triangle
-        -0.9f, -0.5f, 0.0f, // bottom left
-        -0.6f, -0.5f, 0.0f, // bottom right
-        -0.75f, 0.5f, 0.0f, // top
+        -0.7f, -0.5f, 0.0f, // bottom left
+        -0.4f, -0.5f, 0.0f, // bottom right
+        -0.55f, 0.5f, 0.0f, // top
 
         // second triangle
-        0.6f, -0.5f, 0.0f,
-        0.9f, -0.5f, 0.0f,
-        0.75f, 0.5f, 0.0f
+        0.4f, -0.5f, 0.0f, // bottom left
+        0.7f, -0.5f, 0.0f, // bottom right
+        0.55f, 0.5f, 0.0f  // top
 
     };
 
