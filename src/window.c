@@ -71,7 +71,7 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    glViewport(0, 0, SCR_HEIGHT, SCR_WIDTH);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -120,16 +120,16 @@ int main(int argc, char const *argv[])
 
     // setting up vertex data
     float vertices[] = {
-        0.5f, 0.5f, 0.0f,   // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f   // top left
+        // first triangle
+        -0.9f, -0.5f, 0.0f, // bottom left
+        -0.6f, -0.5f, 0.0f, // bottom right
+        -0.75f, 0.5f, 0.0f, // top
 
-    };
+        // second triangle
+        0.6f, -0.5f, 0.0f,
+        0.9f, -0.5f, 0.0f,
+        0.75f, 0.5f, 0.0f
 
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
     };
 
     // Vertex Buffer Object. Basically the data we give to the gpu.
@@ -138,13 +138,9 @@ int main(int argc, char const *argv[])
     // Vertex Array Object
     unsigned int VAO;
 
-    // Element Buffer Object
-    unsigned int EBO;
-
     // generates a unique ID for the given buffer
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
 
@@ -153,9 +149,6 @@ int main(int argc, char const *argv[])
 
     // Copy buffer to the gpu's memory and tell it what kind of object (static) it will show
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // set the vertex attributes pointers
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
@@ -196,8 +189,7 @@ int main(int argc, char const *argv[])
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        //  glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -206,7 +198,6 @@ int main(int argc, char const *argv[])
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
@@ -232,5 +223,3 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
     }
 }
-
-// test
