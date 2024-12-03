@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -31,9 +32,10 @@ const char *vertexShaderSource = "#version 330 core\n"
 
 const char *fragmentShaderSource = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
+                                   "uniform vec4 ourColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "   FragColor = ourColor;\n"
                                    "}\n\0";
 
 int main(int argc, char const *argv[])
@@ -71,7 +73,7 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    glViewport(0, 0, SCR_HEIGHT, SCR_WIDTH);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -120,50 +122,24 @@ int main(int argc, char const *argv[])
 
     // setting up vertex data
     float vertices[] = {
-        0.5f, 0.5f, 0.0f,   // top right
         0.5f, -0.5f, 0.0f,  // bottom right
         -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f   // top left
+        0.0f, 0.5f, 0.0f,   // top
 
     };
 
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
+    unsigned int VBO, VAO;
 
-    // Vertex Buffer Object. Basically the data we give to the gpu.
-    unsigned int VBO;
-
-    // Vertex Array Object
-    unsigned int VAO;
-
-    // Element Buffer Object
-    unsigned int EBO;
-
-    // generates a unique ID for the given buffer
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
 
-    // Bind buffer to a specific buffer type
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    // Copy buffer to the gpu's memory and tell it what kind of object (static) it will show
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // set the vertex attributes pointers
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glBindVertexArray(0);
 
     // shows the Forms in Wireframe mode
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -173,6 +149,8 @@ int main(int argc, char const *argv[])
         listens to Events happening to the gflw window. For example window resizing.
 
     */
+
+    glBindVertexArray(VAO);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -195,9 +173,14 @@ int main(int argc, char const *argv[])
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        //  glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        double timeValue = glfwGetTime();
+        float greenValue = (float)(sin(timeValue) / 2.0 + 0.5);
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+        // render the triangle...
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -206,7 +189,6 @@ int main(int argc, char const *argv[])
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
