@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.15)
 
 
 # Projectname and Languaged used
-project(HelloWorld C)
+project(LunaSphere C)
 
 
 # set C standards..
