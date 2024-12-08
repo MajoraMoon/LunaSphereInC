@@ -3,12 +3,15 @@
 
 #include "window.h"
 
+/*
+    Whenever the window is resized, this function is called, updating the current viewport.
+*/
 static void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
-GLFWwindow *initWindow(unsigned int width, unsigned int height, const char *title)
+GLFWwindow *initWindow(unsigned int width, unsigned int height, const char *title, int vsync)
 {
     // initializing glfw
     if (!glfwInit())
@@ -24,7 +27,7 @@ GLFWwindow *initWindow(unsigned int width, unsigned int height, const char *titl
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // I honestly don't like apple and their products, but maybe it helps someone lol
+// I honestly don't like apple and their products, but maybe it helps someone lol
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -38,6 +41,10 @@ GLFWwindow *initWindow(unsigned int width, unsigned int height, const char *titl
         return NULL;
     }
     glfwMakeContextCurrent(window);
+
+    // For some reason, if I'm trying to make a seperate function to activate vsync, there are errors loading the vertex shader?
+    // everything else works fine, I don't really know why it happens. I guess optimization reasons...
+    glfwSwapInterval(vsync);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -67,7 +74,9 @@ void cleanupWindow(GLFWwindow *window)
     glfwTerminate();
 }
 
-void activateVSync(int activate)
+void updateWindow(GLFWwindow *window)
 {
-    glfwSwapInterval(activate);
+    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+    glfwSwapBuffers(window);
+    glfwPollEvents();
 }

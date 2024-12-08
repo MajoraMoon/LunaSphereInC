@@ -13,9 +13,10 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
+#include "window.h"
+#include "fps.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void processInput(GLFWwindow *window);
 
 // settings
 
@@ -27,54 +28,11 @@ int frames = 0;
 
 int main(int argc, char const *argv[])
 {
-    /*
-     - initializing glfw
-     - Setting the Version of OpenGL to use modern features. Major-version(e.g. 2.0 -> 3.0) Minor-version(e.g. 3.0 -> 3.1)
-     - Setting profile for OpenGL. The Core_Profile can use the modern features of OpenGL, no old (maybe unstable)
-    */
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // setting up a window with GLFW
+    GLFWwindow *window = initWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL window", 1);
 
-// I honestly don't like apple and their products, but maybe it helps someone lol
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Window", NULL, NULL);
-
-    if (window == NULL)
-    {
-        printf("Failed to create GLFW window");
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
-    glfwSwapInterval(1); // V-Sync enabled
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        printf("Failed to initialize GLAD");
-        return -1;
-    }
-
-    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-// set up shaders..
-// handling windows weird way to describe filepaths..
-#ifdef _WIN32
-
+    // set up shaders..
     Shader shader = createShader("../shader/shader.vert", "../shader/shader.frag");
-
-#else
-    // the lovely way!
-    Shader shader = createShader("src/shader/shader.vert", "src/shader/shader.frag");
-
-#endif
 
     // setting up vertex data
     float vertices[] = {
@@ -115,18 +73,10 @@ int main(int argc, char const *argv[])
     while (!glfwWindowShouldClose(window))
     {
 
-        // counts and prints Frames per second
-        double currentTime = glfwGetTime();
-        frames++;
-        if (currentTime - lastTime >= 1.0)
-        {
-            printf("FPS: %d\n", frames);
-            frames = 0;
-            lastTime = currentTime;
-        }
+        calculateAndPrintFPS();
 
         // input
-        processInput(window);
+        processKeyPressInput(window);
 
         // rendering...
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -142,35 +92,14 @@ int main(int argc, char const *argv[])
         // render the triangle...
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        updateWindow(window);
     }
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+
     deleteShader(&shader);
 
-    glfwTerminate();
+    cleanupWindow(window);
     return 0;
-}
-
-/*
-    Whenever the window is resized, this function is called, updating the current viewport.
-*/
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-// function to process input with glfw...
-void processInput(GLFWwindow *window)
-{
-
-    // pressing the escape key closes the window
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-
-        glfwSetWindowShouldClose(window, true);
-    }
 }
