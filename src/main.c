@@ -23,9 +23,6 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
 
-double lastTime = 0.0;
-int frames = 0;
-
 int main(int argc, char const *argv[])
 {
     // setting up a window with GLFW
